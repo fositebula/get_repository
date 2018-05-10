@@ -16,6 +16,8 @@ import smtplib
 import logging
 import logging.handlers
 
+from config import MANIFEST_PATH
+
 TO_SOMEONE = ["dongpl@spreadst.com"]
 MAIL_ACCOUNT = "pl.dong@spreadtrum.com"
 PASSWD = "123@afAF"
@@ -33,7 +35,6 @@ LOG_FILE = "./get_repository.log"
 LOG_LEVEL = logging.INFO
 logger = logging.getLogger(__name__)
 
-MANIFEST_PATH = ''
 MY_GIT = os.path.abspath(__file__) + os.sep + './git.sh'
 
 def logger_init():
@@ -69,15 +70,15 @@ def _get_time_stamp():
 
 def get_manifests(branch):
     manifest_dir = '{}_{}'.format(branch, _get_time_stamp())
+    if os.path.exists(MANIFEST_PATH):
+        manifest_dir = '/'.join([MANIFEST_PATH, manifest_dir])
     sh.mkdir(manifest_dir)
     sh.cd(manifest_dir)
 
     # my_git = sh.Command(MY_GIT)
     sh.git('clone', 'gitadmin@gitmirror.spreadtrum.com:platform/manifest', '-b', branch)
-
-    menifests_path = os.getcwd()
-
-    return menifests_path + os.sep + 'manifest'
+    sh.cd('..')
+    return manifest_dir + os.sep + 'manifest'
 
 def get_sqrecp_repo(sprdtrusty_xml):
     soup = BeautifulSoup(sprdtrusty_xml, 'lxml')
@@ -93,6 +94,9 @@ if __name__ == '__main__':
         # branch = 'sprdroid8.1_trunk'
         manifest_path = get_manifests(branch)
         sprdtrusty_xml = manifest_path + os.sep + 'sprdtrusty.xml'
+        print sprdtrusty_xml
+        print os.path.exists(sprdtrusty_xml)
+        print os.getcwd()
         if os.path.exists(sprdtrusty_xml):
 
             with open(sprdtrusty_xml, 'r') as fd:
