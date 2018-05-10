@@ -79,7 +79,7 @@ def get_sqrecp_repo(sprdtrusty_xml):
 
 
 if __name__ == '__main__':
-        logger_init()
+    logger_init()
     try:
         branch = sys.argv[1]
         # branch = 'sprdroid8.1_trunk'
