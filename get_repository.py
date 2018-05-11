@@ -37,6 +37,9 @@ logger = logging.getLogger(__name__)
 
 MY_GIT = os.path.abspath(__file__) + os.sep + './git.sh'
 
+TRUSTY_FEATRUE = ['sprd_security/vmm/s-vmm', 'sprd_security/bsp', 'sprd_security/trusty']
+
+
 def logger_init():
     logger.setLevel(level = LOG_LEVEL)
     handler = logging.FileHandler(LOG_FILE)
@@ -80,12 +83,25 @@ def get_manifests(branch):
     sh.cd('..')
     return manifest_dir + os.sep + 'manifest'
 
-def get_sqrecp_repo(sprdtrusty_xml):
+def get_trusty_repo(sprdtrusty_xml):
     soup = BeautifulSoup(sprdtrusty_xml, 'lxml')
     projects = soup.find_all('project')
-    repos = map(lambda r : r.get('name'), projects)
-    return repos
+    names = []
+    for project in projects:
+        project_name = project.get('name')
+        if any(map(lambda name : name in project_name, TRUSTY_FEATRUE)):
+            names.append(project_name)
+    return names
 
+def whitch_xml(path):
+    default_xml = path + os.sep + 'default.xml'
+    with open(default_xml) as fd:
+        soup = BeautifulSoup(fd, 'lxml')
+        projects = soup.find_all('project')
+        if len(projects) == 0:
+            trusty_xml = path + os.sep + 'sprdtrusty.xml'
+            return trusty_xml
+        return default_xml
 
 if __name__ == '__main__':
     logger_init()
@@ -93,14 +109,13 @@ if __name__ == '__main__':
         branch = sys.argv[1]
         # branch = 'sprdroid8.1_trunk'
         manifest_path = get_manifests(branch)
-        sprdtrusty_xml = manifest_path + os.sep + 'sprdtrusty.xml'
+        sprdtrusty_xml = whitch_xml(manifest_path)
         print sprdtrusty_xml
         print os.path.exists(sprdtrusty_xml)
         print os.getcwd()
         if os.path.exists(sprdtrusty_xml):
-
             with open(sprdtrusty_xml, 'r') as fd:
-                sprdtrusty_repo_list = get_sqrecp_repo(fd)
+                sprdtrusty_repo_list = get_trusty_repo(fd)
                 other_repo_list = ['kernel/common', 'u-boot15', 'chipram',
                                    'whale_security/ATF/arm-trusted-firmware-1.3',
                                    'whale_security/ATF/arm-trusted-firmware']
