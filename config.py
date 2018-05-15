@@ -1,1 +1,1 @@
-MANIFEST_PATH = ''
+MANIFEST_PATH = '/home/local/SPREADTRUM/pl.dong'

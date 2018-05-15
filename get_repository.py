@@ -35,7 +35,7 @@ LOG_FILE = "./get_repository.log"
 LOG_LEVEL = logging.INFO
 logger = logging.getLogger(__name__)
 
-MY_GIT = os.path.abspath(__file__) + os.sep + './git.sh'
+MY_GIT = os.path.abspath(__file__) + os.sep + 'git.sh'
 
 TRUSTY_FEATRUE = ['sprd_security/vmm/s-vmm', 'sprd_security/bsp', 'sprd_security/trusty']
 
@@ -74,7 +74,7 @@ def _get_time_stamp():
 def get_manifests(branch):
     manifest_dir = '{}_{}'.format(branch, _get_time_stamp())
     if os.path.exists(MANIFEST_PATH):
-        manifest_dir = '/'.join([MANIFEST_PATH, manifest_dir])
+        manifest_dir = MANIFEST_PATH + os.sep + manifest_dir
     sh.mkdir(manifest_dir)
     sh.cd(manifest_dir)
 
@@ -110,9 +110,6 @@ if __name__ == '__main__':
         # branch = 'sprdroid8.1_trunk'
         manifest_path = get_manifests(branch)
         sprdtrusty_xml = whitch_xml(manifest_path)
-        print sprdtrusty_xml
-        print os.path.exists(sprdtrusty_xml)
-        print os.getcwd()
         if os.path.exists(sprdtrusty_xml):
             with open(sprdtrusty_xml, 'r') as fd:
                 sprdtrusty_repo_list = get_trusty_repo(fd)
